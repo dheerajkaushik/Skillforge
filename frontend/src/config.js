@@ -8,4 +8,4 @@ const isLocalhost = window.location.hostname === "localhost" || window.location.
 //    - If on Render    -> Use https://skillforge-backend-osg6.onrender.com/api
 export const API_BASE_URL = isLocalhost
   ? "http://localhost:8080/api"
-  : "https://skillforge-backend-dsfs.onrender.com";
+  : "https://skillforge-backend-dsfs.onrender.com/api";
