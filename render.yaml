@@ -3,42 +3,38 @@ services:
   - type: web
     name: skillforge-backend
     runtime: docker
-    rootDir: backend             # 👈 Points to backend folder
-    plan: free                   # 👈 Free tier (spins down after inactivity)
+    rootDir: backend
+    plan: free
     envVars:
       - key: SPRING_DATASOURCE_URL
-        sync: false              # You will enter this in the Dashboard
+        sync: false
       - key: SPRING_DATASOURCE_USERNAME
         sync: false
       - key: SPRING_DATASOURCE_PASSWORD
         sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      # ✅ FIX 1: Use interpolation to add https://
       - key: RUNNER_URL
-        fromService:
-          type: web
-          name: skillforge-runner
-          property: url          # Auto-links to the runner's URL
+        value: https://${skillforge-runner.host}
 
-  # 2. Frontend Service (Docker)
-  # Note: It is usually cheaper/faster to deploy React as a "Static Site" on Render,
-  # but this config uses your Dockerfile as you requested.
+  # 2. Frontend Service
   - type: web
     name: skillforge-frontend
     runtime: docker
-    rootDir: frontend            # 👈 Points to frontend folder
+    rootDir: frontend
     plan: free
     envVars:
+      # ✅ FIX 2: Use interpolation to add https://
       - key: REACT_APP_API_BASE_URL
-        fromService:
-          type: web
-          name: skillforge-backend
-          property: url          # Auto-links to the backend's URL
+        value: https://${skillforge-backend.host}
 
   # 3. Runner Service
   - type: web
     name: skillforge-runner
     runtime: docker
-    rootDir: skillforge-runner   # 👈 Points to runner folder
+    rootDir: skillforge-runner
     plan: free
     envVars:
-      - key: SOME_RUNNER_VAR
-        value: some_value
+      - key: DUMMY_VAR
+        value: active
