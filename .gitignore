@@ -1,0 +1,24 @@
+# --- Secrets (CRITICAL) ---
+.env
+.DS_Store
+
+# --- Java & Build ---
+target/
+*.class
+*.jar
+*.war
+
+# --- IDE Settings ---
+.idea/
+*.iml
+.vscode/
+
+# --- React / Node ---
+node_modules/
+build/
+dist/
+npm-debug.log
+yarn-error.log
+
+# --- OS Files ---
+Thumbs.db

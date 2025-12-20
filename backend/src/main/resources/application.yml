@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    # Use the Docker Service Name 'mysql-db' instead of localhost if running in Docker
+    # But for now, we'll keep your environment variable override approach
+    #url: jdbc:mysql://mysql-db:3306/skillforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    #url: jdbc:mysql://localhost:3306/skillforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: ${DB_URL}
+    #username: root
+    username: ${DB_USERNAME}
+    #password: Dheeraj@123 # Matches your docker-compose
+    password: ${DB_PASSWORD}
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        #dialect: org.hibernate.dialect.MySQL8Dialect
+        #format_sql: true
+    show-sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+app:
+  jwt:
+    # This key MUST be consistent.
+    secret: Q1wE2rT3yU4iO5pA6sD7fG8hJ9kL0zX1cV2bN3mQ4wE5rT6yU7iO8pA9sD0fG1h
+    expiration-ms: 3600000
+
+runner:
+  url: http://skillforge-runner:9000/api/run
+
+upload:
+  dir: uploads
+  mode: ${UPLOAD_MODE:s3} # Options: 'local' or 's3'
+  local-base: uploads
+
+aws:
+  s3:
+    bucket: ${S3_BUCKET_NAME}
+    region: ${AWS_REGION}
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+ffmpeg:
+  path: ${FFMPEG_PATH:ffmpeg} # Ensure 'ffmpeg' is in your system PATH, or specify full path like /usr/bin/ffmpeg
+  hls-segment-duration: 6

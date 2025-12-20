@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+  # 1. Database Service (MySQL)
+  mysql-db:
+    image: mysql:8.0
+    container_name: skillforge-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: skillforge
+      MYSQL_ROOT_PASSWORD: root  # Set your password here
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  skillforge-runner:
+    build:
+      context: ./skillforge-runner
+      dockerfile: Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock     # allow worker to run docker
+      - /tmp/runner:/tmp/runner
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    ports:
+      - "9000:9000"
+
+  # 2. Backend Service
+  backend:
+    build:
+      context: ./backend
+    container_name: skillforge-backend
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    environment:
+      # Overrides application.properties settings
+      - RUNNER_URL=http://skillforge-runner:9000/run/java
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+    depends_on:
+      - mysql-db
+      - skillforge-runner
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+
+  # 3. Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+    container_name: skillforge-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - WATCHPACK_POLLING=true # Fixes hot-reload issues on Windows Docker
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

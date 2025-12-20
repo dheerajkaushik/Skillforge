@@ -1,0 +1,7 @@
+server:
+  port: 9000
+
+runner:
+  tmp-dir-base: /tmp/runner
+  docker-timeout-sec: 10
+  default-timeout-sec: 5
