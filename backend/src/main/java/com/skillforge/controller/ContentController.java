@@ -160,6 +160,12 @@ public class ContentController {
 
     // --- MODULES ---
 
+    @GetMapping("/courses")
+    public ResponseEntity<List<Course>> getAllCourses() {
+        List<Course> courses = courseRepo.findAll();
+        return ResponseEntity.ok(courses);
+    }
+
     @PostMapping("/courses/{courseId}/modules")
     public ResponseEntity<?> createModule(@PathVariable Long courseId,
                                           @RequestBody Module module,
