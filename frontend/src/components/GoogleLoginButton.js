@@ -1,6 +1,7 @@
 import React from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { API_BASE_URL as API } from "../config";
 
 // 1. Accept 'onLoginSuccess' to match the prop passed from App.js
 export default function GoogleLoginButton({ onLoginSuccess }) {
@@ -11,7 +12,7 @@ export default function GoogleLoginButton({ onLoginSuccess }) {
 
       // 2. Send as JSON object (standard practice)
       // This matches the backend expectation we set up earlier
-      const res = await axios.post("http://localhost:8080/api/auth/google", {
+      const res = await axios.post("`${API_BASE_URL}/auth/google`, {
         idToken: credentialResponse.credential
       });
 

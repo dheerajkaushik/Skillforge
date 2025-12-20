@@ -136,7 +136,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000") // ✅ Ensure React can reach this
+//@CrossOrigin(origins = "http://localhost:3000") // ✅ Ensure React can reach this
 public class ContentController {
 
     private final CourseRepository courseRepo;
