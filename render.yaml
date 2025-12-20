@@ -17,6 +17,14 @@ services:
       # ✅ FIX 1: Use interpolation to add https://
       - key: RUNNER_URL
         value: https://${skillforge-runner.host}
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        value: eu-north-1      # Safe to hardcode (not a secret)
+      - key: S3_BUCKET_NAME
+        value: killforgepro
 
   # 2. Frontend Service
   - type: web

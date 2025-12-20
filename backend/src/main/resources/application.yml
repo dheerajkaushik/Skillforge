@@ -7,11 +7,11 @@ spring:
     # But for now, we'll keep your environment variable override approach
     #url: jdbc:mysql://mysql-db:3306/skillforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     #url: jdbc:mysql://localhost:3306/skillforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    url: ${DB_URL}
+    url: ${SPRING_DATASOURCE_URL}
     #username: root
-    username: ${DB_USERNAME}
+    username: ${SPRING_DATASOURCE_USERNAME}
     #password: Dheeraj@123 # Matches your docker-compose
-    password: ${DB_PASSWORD}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     #driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: org.postgresql.Driver
 
