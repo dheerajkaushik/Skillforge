@@ -7,8 +7,8 @@ import Button from "./ui/Button";
 
 // Import the API helper
 import QuizApi from '../api/quizApi'; // Ensure casing matches your file name
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API } from "../config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function QuizList({ lessonId: propLessonId, onSelect }) {
   // 1. Handle ID from Props OR URL Params

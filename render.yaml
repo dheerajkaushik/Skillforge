@@ -14,15 +14,21 @@ services:
         sync: false
       - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
         value: org.postgresql.Driver
-      # ✅ FIX 1: Use interpolation to add https://
-      - key: RUNNER_URL
-        value: https://${skillforge-runner.host}
+
+      # ✅ FIX 1: Pass only the HOSTNAME safely
+      # (Your Java code must now add "https://" before this value)
+      - key: RUNNER_HOST
+        fromService:
+          type: web
+          name: skillforge-runner
+          property: host
+
       - key: AWS_ACCESS_KEY_ID
         sync: false
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
       - key: AWS_REGION
-        value: eu-north-1      # Safe to hardcode (not a secret)
+        value: eu-north-1
       - key: S3_BUCKET_NAME
         value: killforgepro
 
@@ -33,9 +39,13 @@ services:
     rootDir: frontend
     plan: free
     envVars:
-      # ✅ FIX 2: Use interpolation to add https://
-      - key: REACT_APP_API_BASE_URL
-        value: https://${skillforge-backend.host}
+      # ✅ FIX 2: Pass only the HOSTNAME safely
+      # (Your React code must now add "https://" before this value)
+      - key: REACT_APP_BACKEND_HOST
+        fromService:
+          type: web
+          name: skillforge-backend
+          property: host
 
   # 3. Runner Service
   - type: web

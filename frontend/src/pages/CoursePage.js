@@ -11,8 +11,8 @@ import Card from "../components/ui/Card";
 import Progress from "../components/ui/Progress";
 import Button from "../components/ui/Button";
 import DragDropUpload from "../components/DragDropUpload";
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API} from "../config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function CoursePage({ user }) {
   const { id } = useParams();

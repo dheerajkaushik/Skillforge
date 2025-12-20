@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API } from "../config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function CreateCodingProblem() {
   const navigate = useNavigate();

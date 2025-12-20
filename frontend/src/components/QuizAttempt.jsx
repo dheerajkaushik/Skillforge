@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { submitQuiz, getInstructorQuizById } from '../api/quizApi'; // Ensure this path matches your file structure
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API } from "../config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function QuizAttempt() {
   const { quizId } = useParams();

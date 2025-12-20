@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PageContainer from "./components/layout/PageContainer";
 import Card from "./components/ui/Card";
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL } from "./config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api"; //for local
 
 export default function AdminSubmissions({ token, user }) {
   const [subs, setSubs] = useState([]);

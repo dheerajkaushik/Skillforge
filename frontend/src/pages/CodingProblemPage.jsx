@@ -6,8 +6,8 @@ import VerdictBox from "../components/VerdictBox";
 // ✅ IMPORT YOUR LEADERBOARD COMPONENT
 import Leaderboard from "../Leaderboard";
 import { fetchProblem, fetchSamples, submitCode } from "../services/codingApi";
-
-const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API} from "../config";
+//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function CodingProblemPage() {
   const { problemId } = useParams();

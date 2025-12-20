@@ -38,7 +38,8 @@ app:
     expiration-ms: 3600000
 
 runner:
-  url: http://skillforge-runner:9000/api/run
+  #url: http://skillforge-runner:9000/api/run
+  url: ${RUNNER_PROTOCOL:https}://${RUNNER_HOST:skillforge-runner:9000}/run/java
 
 upload:
   dir: uploads
