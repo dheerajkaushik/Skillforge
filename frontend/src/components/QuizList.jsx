@@ -3,12 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Trash2, ChevronDown, ChevronRight, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 import Button from "./ui/Button";
-// ^ Adjust the path if your Button is in a different folder
 
-// Import the API helper
-import QuizApi from '../api/quizApi'; // Ensure casing matches your file name
+import QuizApi from '../api/quizApi';
 import { API_BASE_URL as API } from "../config";
-//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function QuizList({ lessonId: propLessonId, onSelect }) {
   // 1. Handle ID from Props OR URL Params
@@ -50,10 +47,8 @@ export default function QuizList({ lessonId: propLessonId, onSelect }) {
       // 2. Choose the correct API endpoint based on Role
       let res;
       if (isInstructor) {
-          // ✅ Use the new Instructor endpoint
           res = await QuizApi.getInstructorQuizzes(lessonId, token);
       } else {
-          // Use the Student endpoint
           res = await QuizApi.getQuizzesByLesson(lessonId, token);
       }
 
@@ -70,7 +65,6 @@ export default function QuizList({ lessonId: propLessonId, onSelect }) {
  async function handleCreateQuiz() {
      if (!newQuizTitle.trim()) return alert("Enter a title");
 
-     // Safety check: ensure user data is loaded
      if (!user || !user.id) return alert("User data not loaded. Please refresh.");
 
      try {
@@ -100,7 +94,6 @@ export default function QuizList({ lessonId: propLessonId, onSelect }) {
     <div className="max-w-3xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6">Quizzes</h2>
       <Button onClick={() => navigate(-1)}>Go Back</Button>
-
 
       {/* --- INSTRUCTOR: CREATE QUIZ --- */}
       {isInstructor && (
@@ -133,7 +126,8 @@ export default function QuizList({ lessonId: propLessonId, onSelect }) {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-semibold">{q.title}</h3>
-                  <p className="text-sm text-gray-500">{q.questions?.length || 0} Questions</p>
+                  {/* ✅ UPDATED: Supports both Student response (questionsCount) and Instructor response (questions array) */}
+                  <p className="text-sm text-gray-500">{q.questionsCount || q.questions?.length || 0} Questions</p>
                 </div>
 
                 <div className="flex gap-2 items-center">
@@ -152,13 +146,23 @@ export default function QuizList({ lessonId: propLessonId, onSelect }) {
                     </>
                   )}
 
-                  {/* Student/Nav Button */}
-                  <button
-                    className="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-800"
-                    onClick={() => onSelect ? onSelect(q) : navigate(`/quiz/${q.id}`)}
-                  >
-                    Attempt Quiz
-                  </button>
+                  {/* ✅ NEW LOGIC: Disable button if Student + Attempted */}
+                  {!isInstructor && q.attempted ? (
+                    <button
+                        disabled
+                        className="px-4 py-2 rounded-xl bg-gray-400 text-white cursor-not-allowed border border-gray-300 flex items-center gap-2"
+                    >
+                        Submitted <CheckCircle size={16} />
+                    </button>
+                  ) : (
+                    <button
+                        className="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition-colors"
+                        onClick={() => onSelect ? onSelect(q) : navigate(`/quiz/${q.id}`)}
+                    >
+                        {isInstructor ? "Preview Quiz" : "Attempt Quiz"}
+                    </button>
+                  )}
+
                 </div>
               </div>
 

@@ -1,12 +1,16 @@
 package com.skillforge.controller;
 
 import com.skillforge.entity.Quiz;
+import com.skillforge.repository.QuizAttemptRepository; // ✅ Added Repository
 import com.skillforge.service.QuizAttemptService;
 import com.skillforge.service.QuizService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication; // ✅ Added Auth
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,27 +20,51 @@ public class StudentQuizController {
 
     private final QuizService quizService;
     private final QuizAttemptService quizAttemptService;
+    private final QuizAttemptRepository quizAttemptRepo; // ✅ Inject Repository
 
     public StudentQuizController(
             QuizService quizService,
-            QuizAttemptService quizAttemptService
+            QuizAttemptService quizAttemptService,
+            QuizAttemptRepository quizAttemptRepo
     ) {
         this.quizService = quizService;
         this.quizAttemptService = quizAttemptService;
+        this.quizAttemptRepo = quizAttemptRepo;
     }
 
-    // 1. Get List of Quizzes for a Lesson
+    // 1. Get List of Quizzes for a Lesson (With "Attempted" Status)
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/lessons/{lessonId}/quizzes")
-    public ResponseEntity<List<Quiz>> getQuizzesByLesson(
-            @PathVariable Long lessonId
+    public ResponseEntity<List<Map<String, Object>>> getQuizzesByLesson(
+            @PathVariable Long lessonId,
+            Authentication auth // ✅ Get User from Token
     ) {
-        return ResponseEntity.ok(
-                quizService.getQuizzesByLesson(lessonId)
-        );
+        if (auth == null) return ResponseEntity.status(401).build();
+        Long userId = Long.parseLong(auth.getPrincipal().toString());
+
+        // Fetch raw quizzes
+        List<Quiz> quizzes = quizService.getQuizzesByLesson(lessonId);
+
+        // Prepare response with "attempted" flag
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Quiz quiz : quizzes) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", quiz.getId());
+            map.put("title", quiz.getTitle());
+            map.put("questionsCount", quiz.getQuestions() != null ? quiz.getQuestions().size() : 0);
+
+            // ✅ CRITICAL: Check if this user already submitted this quiz
+            boolean hasAttempted = quizAttemptRepo.existsByUserIdAndQuizId(userId, quiz.getId());
+            map.put("attempted", hasAttempted);
+
+            response.add(map);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
-    // ✅ 2. NEW METHOD: Get Single Quiz by ID (Fixes the 404 Error)
+    // 2. Get Single Quiz by ID
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/quizzes/{quizId}")
     public ResponseEntity<Quiz> getQuizById(@PathVariable Long quizId) {
@@ -45,17 +73,25 @@ public class StudentQuizController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 3. Submit Quiz
+    // 3. Submit Quiz (Now safer!)
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/quizzes/{quizId}/submit")
-    public ResponseEntity<Integer> submitQuiz(
+    public ResponseEntity<?> submitQuiz(
             @PathVariable Long quizId,
-            @RequestParam Long studentId,
-            @RequestBody Map<Long, String> answers
+            @RequestBody Map<Long, String> answers,
+            Authentication auth
     ) {
+        Long userId = Long.parseLong(auth.getPrincipal().toString());
+
+        // ✅ SAFETY: Block duplicate submissions at API level
+        if (quizAttemptRepo.existsByUserIdAndQuizId(userId, quizId)) {
+            return ResponseEntity.status(409).body("You have already submitted this quiz!");
+        }
+
+        // Proceed with submission
         Integer score = quizAttemptService.submitQuiz(
                 quizId,
-                studentId,
+                userId,
                 answers
         );
 
