@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> {
 
     Optional<QuizAttempt> findByQuizIdAndStudentId(Long quizId, Long studentId);
+    boolean existsByUserIdAndQuizId(Long userId, Long quizId);
 }
