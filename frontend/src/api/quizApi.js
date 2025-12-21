@@ -15,10 +15,10 @@ const getHeaders = (token) => {
 // ==========================================
 
 export const getQuizzesByLesson = (lessonId, token) =>
-    axios.get(`${API_BASE_URL}/api/student/lessons/${lessonId}/quizzes`, getHeaders(token));
+    axios.get(`${API_BASE_URL}/student/lessons/${lessonId}/quizzes`, getHeaders(token));
 
 export const submitQuiz = (quizId, answers, studentId, token) =>
-    axios.post(`${API_BASE_URL}/api/student/quizzes/${quizId}/submit?studentId=${studentId}`, answers, getHeaders(token));
+    axios.post(`${API_BASE_URL}/student/quizzes/${quizId}/submit?studentId=${studentId}`, answers, getHeaders(token));
 
 
 // ==========================================
@@ -27,15 +27,15 @@ export const submitQuiz = (quizId, answers, studentId, token) =>
 
 // ✅ NEW: Instructor specific fetch to avoid 403 errors
 export const getInstructorQuizzes = (lessonId, token) =>
-    axios.get(`${API_BASE_URL}/api/instructor/quizzes/lesson/${lessonId}`, getHeaders(token));
+    axios.get(`${API_BASE_URL}/instructor/quizzes/lesson/${lessonId}`, getHeaders(token));
 
     // ✅ NEW: Get Single Quiz for Instructor
     export const getInstructorQuizById = (quizId, token) =>
-        axios.get(`${API_BASE_URL}/api/instructor/quizzes/${quizId}`, getHeaders(token));
+        axios.get(`${API_BASE_URL}/instructor/quizzes/${quizId}`, getHeaders(token));
 
 export const createQuiz = (lessonId, title, instructorId, token) => {
     return axios.post(
-        `${API_BASE_URL}/api/instructor/quizzes`,
+        `${API_BASE_URL}/instructor/quizzes`,
         null,
         {
             ...getHeaders(token),
@@ -46,7 +46,7 @@ export const createQuiz = (lessonId, title, instructorId, token) => {
 
 export const addQuestion = (quizId, qData, token) => {
     return axios.post(
-        `${API_BASE_URL}/api/instructor/quizzes/${quizId}/questions`,
+        `${API_BASE_URL}/instructor/quizzes/${quizId}/questions`,
         null,
         {
             ...getHeaders(token),
@@ -64,10 +64,10 @@ export const addQuestion = (quizId, qData, token) => {
 };
 
 export const deleteQuiz = (quizId, token) =>
-    axios.delete(`${API_BASE_URL}/api/instructor/quizzes/${quizId}`, getHeaders(token));
+    axios.delete(`${API_BASE_URL}/instructor/quizzes/${quizId}`, getHeaders(token));
 
 export const deleteQuestion = (questionId, token) =>
-    axios.delete(`${API_BASE_URL}/api/instructor/questions/${questionId}`, getHeaders(token));
+    axios.delete(`${API_BASE_URL}/instructor/questions/${questionId}`, getHeaders(token));
 
 
 
