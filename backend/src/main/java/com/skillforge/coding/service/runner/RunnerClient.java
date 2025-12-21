@@ -30,11 +30,13 @@ public class RunnerClient {
             payload.put("input", testCase.getInput() != null ? testCase.getInput() : "");
             payload.put("language", "java");
 
-            System.out.println("🚀 Sending to Runner: " + runnerUrl + "/run/java");
+            String fullUrl = runnerUrl + "/run/java";
+
+            System.out.println("🚀 Sending to Runner: " + fullUrl);
 
             // ✅ FIX 3: Use the injected URL variable
             return restTemplate.postForObject(
-                    runnerUrl,
+                    fullUrl,
                     payload,
                     RunnerResult.class
             );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL as API } from "./config";
 
 export default function Leaderboard({ problemId }) {
   // ✅ FIX: Define token at the top level so it is ALWAYS available
@@ -23,7 +24,7 @@ export default function Leaderboard({ problemId }) {
     setError(null);
 
     axios
-      .get(`http://localhost:8080/api/analytics/leaderboard/${problemId}`, {
+      .get(`${API}/analytics/leaderboard/${problemId}`, {
         headers: {
            // ✅ Token is definitely defined now because it's at the component top level
            Authorization: `Bearer ${token}`
