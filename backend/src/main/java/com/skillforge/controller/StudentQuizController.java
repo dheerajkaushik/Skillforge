@@ -55,7 +55,7 @@ public class StudentQuizController {
             map.put("questionsCount", quiz.getQuestions() != null ? quiz.getQuestions().size() : 0);
 
             // ✅ CRITICAL: Check if this user already submitted this quiz
-            boolean hasAttempted = quizAttemptRepo.existsByUserIdAndQuizId(userId, quiz.getId());
+            boolean hasAttempted = quizAttemptRepo.existsByStudentIdAndQuizId(userId, quiz.getId());
             map.put("attempted", hasAttempted);
 
             response.add(map);
@@ -84,7 +84,7 @@ public class StudentQuizController {
         Long userId = Long.parseLong(auth.getPrincipal().toString());
 
         // ✅ SAFETY: Block duplicate submissions at API level
-        if (quizAttemptRepo.existsByUserIdAndQuizId(userId, quizId)) {
+        if (quizAttemptRepo.existsByStudentIdAndQuizId(userId, quizId)) {
             return ResponseEntity.status(409).body("You have already submitted this quiz!");
         }
 
