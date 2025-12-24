@@ -31,7 +31,7 @@ export default function InstructorDashboard() {
     setLoading(true);
 
     // 3. Fetch from your specific Controller Endpoint
-    axios.get(`${API}/api/instructor/dashboard`, {
+    axios.get(`${API}/instructor/dashboard`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => {
