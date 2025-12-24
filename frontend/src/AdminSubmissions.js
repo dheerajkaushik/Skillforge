@@ -18,7 +18,7 @@ export default function AdminSubmissions({ token, user }) {
   async function load(authToken) {
     try {
       setLoading(true);
-      const res = await axios.get(API + "/admin/submissions", {
+      const res = await axios.get(API_BASE_URL + "/admin/submissions", {
         headers: { Authorization: "Bearer " + authToken }
       });
       setSubs(res.data);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PageContainer from "./components/layout/PageContainer";
 import Card from "./components/ui/Card";
-import { API_BASE_URL } from "./config"; // for render
+import { API_BASE_URL as API} from "./config"; // for render
 //const API = process.env.REACT_APP_API || "http://localhost:8080/api";
 
 export default function AdminEnrollmentStats({ token, user }) {

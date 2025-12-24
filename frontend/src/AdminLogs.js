@@ -18,7 +18,7 @@ export default function AdminLogs({ token, user }) {
   async function load(authToken) {
     try {
       setLoading(true);
-      const res = await axios.get(API + "/admin/logs", {
+      const res = await axios.get(API_BASE_URL + "/admin/logs", {
         headers: { Authorization: "Bearer " + authToken }
       });
       setLogs(res.data);

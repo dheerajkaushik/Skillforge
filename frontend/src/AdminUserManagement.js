@@ -16,7 +16,7 @@ export default function AdminUserManagement({ token, user }) {
 
     try {
       setLoading(true);
-      const res = await axios.get(API + "/admin/users", {
+      const res = await axios.get(API_BASE_URL + "/admin/users", {
         headers: { Authorization: "Bearer " + effectiveToken }
       });
       setUsers(res.data);
