@@ -28,7 +28,10 @@ public class RunnerClient {
 
             return restTemplate.postForObject(runnerUrl + "/run/java", payload, RunnerResult.class);
         } catch (Exception e) {
-            return new RunnerResult("Connection Failed", e.getMessage());
+            RunnerResult errorResult = new RunnerResult();
+            errorResult.setOutput("Connection Failed");
+            errorResult.setError(e.getMessage());
+            return errorResult;
         }
     }
 
