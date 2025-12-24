@@ -56,6 +56,15 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
         int total = testCases.size();
 
         for (TestCase testCase : testCases) {
+
+            // ✅ FIX: Add a 1-second delay to prevent "429 Too Many Requests"
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            // The rest of your logic stays exactly the same
             RunnerResult result = runnerClient.runJavaCode(sourceCode, testCase);
 
             System.out.println("--- Test Case ---");
@@ -67,7 +76,6 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
                 finalVerdict = Verdict.RUNTIME_ERROR;
                 break;
             }
-
 
             boolean correct = OutputComparator.isOutputCorrect(
                     result.getOutput(),
