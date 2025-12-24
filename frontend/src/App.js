@@ -14,6 +14,7 @@ import QuizList from "./components/QuizList";
 import QuizAttempt from "./components/QuizAttempt";
 import CodingProblemPage from "./pages/CodingProblemPage";
 import CreateCodingProblem from "./pages/CreateCodingProblem";
+import StudentSubmissions from "./pages/StudentSubmissions";
 import { API_BASE_URL as API} from "./config"; // for render
 //const API = process.env.REACT_APP_API || "http://localhost:8080/api"; // for local
 
