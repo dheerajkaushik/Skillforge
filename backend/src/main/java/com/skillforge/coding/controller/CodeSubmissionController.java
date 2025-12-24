@@ -34,11 +34,11 @@ public class CodeSubmissionController {
         return submissionService.submitCode(problemId, studentId, sourceCode);
     }
     @GetMapping("/my")
-    public ResponseEntity<List<Submission>> getMySubmissions(Principal principal) {
+    public ResponseEntity<List<CodeSubmission>> getMySubmissions(Principal principal) {
         // Principal holds the email/username extracted from the JWT token
         String email = principal.getName();
 
-        List<Submission> history = submissionService.getSubmissionsForUser(email);
+        List<CodeSubmission> history = submissionService.getSubmissionsForUser(email);
 
         return ResponseEntity.ok(history);
     }
