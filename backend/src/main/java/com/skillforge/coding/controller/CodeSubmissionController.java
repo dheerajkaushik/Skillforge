@@ -38,7 +38,7 @@ public class CodeSubmissionController {
         // Principal holds the email/username extracted from the JWT token
         String email = principal.getName();
 
-        List<CodeSubmission> history = submissionService.getSubmissionsForUser(email);
+        List<CodeSubmission> history = submissionService.getSubmissionsForUserEmail(email);
 
         return ResponseEntity.ok(history);
     }
