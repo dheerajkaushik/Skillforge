@@ -199,7 +199,13 @@ public class RunnerService {
 
             try {
                 String output = outputFuture.get(TIME_LIMIT_MS, TimeUnit.MILLISECONDS);
-                String error = errorFuture.get(TIME_LIMIT_MS, TimeUnit.MILLISECONDS);
+                String errorRaw = errorFuture.get(TIME_LIMIT_MS, TimeUnit.MILLISECONDS);
+
+                String error = errorRaw.lines()
+                        .filter(line -> !line.contains("Picked up JAVA_TOOL_OPTIONS"))
+                        .reduce((a, b) -> a + "\n" + b)
+                        .orElse("")
+                        .trim();
 
                 if (!error.isEmpty()) {
                     System.err.println("❌ Runtime Error: " + error);
