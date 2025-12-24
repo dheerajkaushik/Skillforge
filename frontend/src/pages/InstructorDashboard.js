@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import PageContainer from "../components/layout/PageContainer";
+import { API_BASE_URL as API } from "../config";
 
 export default function InstructorDashboard() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function InstructorDashboard() {
     setLoading(true);
 
     // 3. Fetch from your specific Controller Endpoint
-    axios.get("http://localhost:8080/api/instructor/dashboard", {
+    axios.get(`${API}/api/instructor/dashboard`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => {

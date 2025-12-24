@@ -149,10 +149,22 @@ public class RunnerService {
             // Safe replacement
             String correctedCode = sourceCode.replaceAll("public\\s+class\\s+\\w+", "public class Main");
 
+            System.out.println("📝 Compiling Code in: " + dir.getAbsolutePath());
+
             try (FileWriter fw = new FileWriter(javaFile)) {
                 fw.write(correctedCode);
             }
 
+            ProcessBuilder checkJavac = new ProcessBuilder("javac", "-version");
+            try {
+                if (checkJavac.start().waitFor() != 0) {
+                    System.err.println("❌ javac not found! Ensure Dockerfile uses a JDK image.");
+                }
+            } catch (IOException e) {
+                result.setSuccess(false);
+                result.setError("Configuration Error: 'javac' compiler is missing in the Runner container.");
+                return result;
+            }
             // Compile
             ProcessBuilder compileBuilder = new ProcessBuilder("javac", "Main.java");
             compileBuilder.directory(dir);
@@ -161,6 +173,7 @@ public class RunnerService {
 
             String compileOutput = readStream(compile.getInputStream());
             if (compile.waitFor() != 0) {
+                System.err.println("❌ Compilation Failed:\n" + compileOutput);
                 result.setSuccess(false);
                 result.setError("Compilation Error:\n" + compileOutput);
                 return result;
@@ -173,7 +186,7 @@ public class RunnerService {
 
             if (input != null && !input.isEmpty()) {
                 try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(run.getOutputStream()))) {
-                    String cleanInput = input.replace("[", "").replace("]", "").replace(",", " ");
+                    String cleanInput = input.replace("[", "").replace("]", "").replace(",", " ").trim();
                     writer.write(cleanInput);
                     writer.newLine();
                     writer.flush();
@@ -189,9 +202,11 @@ public class RunnerService {
                 String error = errorFuture.get(TIME_LIMIT_MS, TimeUnit.MILLISECONDS);
 
                 if (!error.isEmpty()) {
+                    System.err.println("❌ Runtime Error: " + error);
                     result.setSuccess(false);
                     result.setError(error);
                 } else {
+                    System.out.println("✅ Execution Success. Output: " + output.trim());
                     result.setSuccess(true);
                     result.setOutput(output.trim());
                 }

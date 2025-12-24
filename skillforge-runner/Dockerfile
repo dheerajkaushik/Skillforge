@@ -18,4 +18,4 @@ RUN adduser -D runneruser
 USER runneruser
 
 EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "runner.jar"]
+ENTRYPOINT ["java","-Xmx350m", "-jar", "runner.jar"]

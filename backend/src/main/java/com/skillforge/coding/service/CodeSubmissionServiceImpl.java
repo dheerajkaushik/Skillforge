@@ -77,7 +77,12 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
 
                 System.out.println("--- Test Case " + (i + 1) + " ---");
                 System.out.println("Expected: [" + testCase.getExpectedOutput() + "]");
-                System.out.println("Actual:   [" + result.getOutput() + "]");
+                if (result.getError() != null && !result.getError().isEmpty()) {
+                    System.out.println("❌ RUNNER ERROR: " + result.getError());
+                    finalVerdict = Verdict.RUNTIME_ERROR;
+                    break;
+                }else{
+                System.out.println("Actual:   [" + result.getOutput() + "]");}
 
                 // Check for Runtime Errors/Compilation Errors
                 if (result.getError() != null && !result.getError().isEmpty()) {
