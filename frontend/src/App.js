@@ -283,6 +283,7 @@ function App() {
         <Route path="/coding/problem/:problemId" element={<CodingProblemPage />} />
         <Route path="/instructor/coding/create" element={<CreateCodingProblem />} />
          <Route path="/coding/problem/:problemId" element={<CodingProblemPage />} />
+         <Route path="/student/submissions" element={<StudentSubmissions />} />
 
       </Routes>
     </div>

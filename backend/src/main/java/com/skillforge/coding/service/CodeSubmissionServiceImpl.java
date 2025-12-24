@@ -11,6 +11,8 @@ import com.skillforge.coding.service.runner.RunnerClient;
 import com.skillforge.coding.service.runner.RunnerResult;
 import com.skillforge.coding.util.OutputComparator;
 import org.springframework.stereotype.Service;
+import com.skillforge.entity.User;
+import com.skillforge.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,15 +26,18 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
     private final TestCaseRepository testCaseRepository;
     private final RunnerClient runnerClient;
     private final CodingProblemRepository codingProblemRepository;
+    private final UserRepository userRepository;
 
     public CodeSubmissionServiceImpl(CodeSubmissionRepository codeSubmissionRepository,
                                      TestCaseRepository testCaseRepository,
                                      RunnerClient runnerClient,
-                                     CodingProblemRepository codingProblemRepository) {
+                                     CodingProblemRepository codingProblemRepository,
+                                     UserRepository userRepository) {
         this.codeSubmissionRepository = codeSubmissionRepository;
         this.testCaseRepository = testCaseRepository;
         this.runnerClient = runnerClient;
         this.codingProblemRepository = codingProblemRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -121,5 +126,13 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
     @Override
     public List<CodeSubmission> getSubmissionsByProblem(Long problemId) {
         return codeSubmissionRepository.findByProblemId(problemId);
+    }
+
+    @Override
+    public List<CodeSubmission> getSubmissionsForUserEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
+
+        return codeSubmissionRepository.findByStudentIdOrderBySubmittedAtDesc(user.getId());
     }
 }

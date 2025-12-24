@@ -11,4 +11,5 @@ public interface CodeSubmissionService {
     List<CodeSubmission> getSubmissionsByStudent(Long studentId);
 
     List<CodeSubmission> getSubmissionsByProblem(Long problemId);
+    List<CodeSubmission> getSubmissionsForUserEmail(String email);
 }

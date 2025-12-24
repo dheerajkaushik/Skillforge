@@ -85,6 +85,12 @@ export default function CodingProblemPage() {
               >
                 🏆 Leaderboard
               </button>
+              <button
+              onClick={() => setActiveTab("Submission History")}
+                className={`flex-1 py-3 text-sm font-semibold ${activeTab === 'leaderboard' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                >
+                🏆 Leaderboard
+               </button>
             </div>
 
             {/* 2. TAB CONTENT (Scrollable Area) */}

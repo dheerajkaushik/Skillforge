@@ -16,18 +16,32 @@ export default function AdminSubmissions({ token, user }) {
   }, [token]);
 
   async function load(authToken) {
-    try {
-      setLoading(true);
-      const res = await axios.get(API_BASE_URL + "/admin/submissions", {
-        headers: { Authorization: "Bearer " + authToken }
-      });
-      setSubs(res.data);
-    } catch (e) {
-      console.error("Failed to load submissions", e);
-    } finally {
-      setLoading(false);
+      try {
+        setLoading(true);
+
+        // Ensure the URL matches your backend (add /api if needed, as discussed)
+        const res = await axios.get(API_BASE_URL + "/admin/submissions", {
+          headers: { Authorization: "Bearer " + authToken }
+        });
+
+        console.log("Debug Submissions:", res.data); // Inspect the data in Console
+
+        // FIX: Handle both standard Array and Spring Boot "Page" object
+        if (Array.isArray(res.data)) {
+          setSubs(res.data);
+        } else if (res.data && Array.isArray(res.data.content)) {
+          // If your backend returns a Page object (e.g., { content: [...], totalPages: 5 })
+          setSubs(res.data.content);
+        } else {
+          setSubs([]); // Fallback
+        }
+
+      } catch (e) {
+        console.error("Failed to load submissions", e);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
   // Access Control
   if (user && user.role !== "ADMIN") {
