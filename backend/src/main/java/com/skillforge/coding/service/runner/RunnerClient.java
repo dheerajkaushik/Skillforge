@@ -2,16 +2,14 @@ package com.skillforge.coding.service.runner;
 
 import com.skillforge.coding.entity.TestCase;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service; // Changed from @Component to @Service (better semantic)
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class RunnerClient {
 
-    // ✅ FIX 1: Injection must happen at Class Level
     @Value("${runner.url}")
     private String runnerUrl;
 
@@ -21,31 +19,41 @@ public class RunnerClient {
         this.restTemplate = new RestTemplate();
     }
 
+    // Keep the old method if needed for single runs
     public RunnerResult runJavaCode(String sourceCode, TestCase testCase) {
         try {
-            // ✅ FIX 2: Create a JSON Payload (Map) instead of sending raw string
-            // The Runner expects: { "code": "...", "input": "..." }
             Map<String, String> payload = new HashMap<>();
             payload.put("code", sourceCode);
             payload.put("input", testCase.getInput() != null ? testCase.getInput() : "");
-            payload.put("language", "java");
 
-            String fullUrl = runnerUrl + "/run/java";
+            return restTemplate.postForObject(runnerUrl + "/run/java", payload, RunnerResult.class);
+        } catch (Exception e) {
+            return new RunnerResult("Connection Failed", e.getMessage());
+        }
+    }
 
-            System.out.println("🚀 Sending to Runner: " + fullUrl);
+    // ✅ NEW BATCH METHOD
+    public List<RunnerResult> runBatch(String sourceCode, List<String> inputs) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("code", sourceCode);
+            payload.put("inputs", inputs); // Sending the LIST
 
-            // ✅ FIX 3: Use the injected URL variable
-            return restTemplate.postForObject(
+            String fullUrl = runnerUrl + "/run/java/batch";
+            System.out.println("🚀 Sending Batch to Runner: " + fullUrl);
+
+            // We expect an Array of RunnerResults back
+            RunnerResult[] response = restTemplate.postForObject(
                     fullUrl,
                     payload,
-                    RunnerResult.class
+                    RunnerResult[].class
             );
 
+            return response != null ? Arrays.asList(response) : new ArrayList<>();
+
         } catch (Exception e) {
-            System.err.println("❌ Runner Connection Failed: " + e.getMessage());
-            RunnerResult fallback = new RunnerResult();
-            fallback.setError("Connection failed: " + e.getMessage());
-            return fallback;
+            System.err.println("❌ Runner Batch Connection Failed: " + e.getMessage());
+            return new ArrayList<>(); // Return empty list on failure
         }
     }
 }

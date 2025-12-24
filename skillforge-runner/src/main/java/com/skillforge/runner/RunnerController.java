@@ -24,10 +24,12 @@
 
 package com.skillforge.runner;
 
+import com.skillforge.runner.dto.BatchRunRequest;
 import com.skillforge.runner.dto.RunRequest;
-import com.skillforge.runner.RunnerResult; // Matches your package for RunnerResult
-import com.skillforge.runner.RunnerService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class RunnerController {
@@ -38,21 +40,29 @@ public class RunnerController {
         this.runnerService = runnerService;
     }
 
-    // ✅ Health Check
     @GetMapping("/")
     public String healthCheck() {
         return "SkillForge Runner is Active & Ready! 🚀";
     }
 
+    // Single Execution (Old method, keeping it just in case)
     @PostMapping("/run/java")
     public RunnerResult runJavaCode(@RequestBody RunRequest request) {
-        // ✅ FIX: Use .getCode() and .getInput() to match your DTO
-        String codePreview = (request.getCode() != null)
-                ? request.getCode().substring(0, Math.min(20, request.getCode().length())) + "..."
-                : "null";
-
-        System.out.println("📥 Runner Received -> Code: [" + codePreview + "], Input: [" + request.getInput() + "]");
-
         return runnerService.runJava(request.getCode(), request.getInput());
+    }
+
+    // ✅ NEW BATCH ENDPOINT (Fixes 429 Error)
+    @PostMapping("/run/java/batch")
+    public List<RunnerResult> runJavaBatch(@RequestBody BatchRunRequest request) {
+        List<RunnerResult> results = new ArrayList<>();
+
+        System.out.println("📥 Batch Received -> Inputs count: " + request.getInputs().size());
+
+        // We loop locally inside the server (Fast & No Network Overhead)
+        for (String input : request.getInputs()) {
+            results.add(runnerService.runJava(request.getCode(), input));
+        }
+
+        return results;
     }
 }

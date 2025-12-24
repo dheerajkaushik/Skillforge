@@ -13,7 +13,9 @@ import com.skillforge.coding.util.OutputComparator;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CodeSubmissionServiceImpl implements CodeSubmissionService {
@@ -33,62 +35,71 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
         this.codingProblemRepository = codingProblemRepository;
     }
 
-    // ✅ FIXED: Signature matches Interface (3 arguments)
     @Override
     public CodeSubmission submitCode(Long problemId, Long studentId, String sourceCode) {
 
         CodeSubmission submission = new CodeSubmission();
 
-        // Fetch Problem Relationship
+        // 1. Setup Submission Metadata
         CodingProblem problem = codingProblemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("Problem not found"));
 
         submission.setProblem(problem);
         submission.setStudentId(studentId);
-        submission.setSourceCode(sourceCode); // Ensure CodeSubmission entity has setSourceCode()
+        submission.setSourceCode(sourceCode);
         submission.setLanguage("JAVA");
         submission.setSubmittedAt(LocalDateTime.now());
 
+        // 2. Fetch Test Cases
         List<TestCase> testCases = testCaseRepository.findByProblemId(problemId);
+
+        // 3. Prepare Batch Data (Extract inputs)
+        List<String> inputs = testCases.stream()
+                .map(tc -> tc.getInput() != null ? tc.getInput() : "")
+                .collect(Collectors.toList());
+
+        // 4. ✅ ONE NETWORK CALL (Batch Execution)
+        List<RunnerResult> results = runnerClient.runBatch(sourceCode, inputs);
 
         Verdict finalVerdict = Verdict.ACCEPTED;
         int passed = 0;
         int total = testCases.size();
 
-        for (TestCase testCase : testCases) {
+        // 5. Validation Loop (Local processing only)
+        if (results.isEmpty() || results.size() != total) {
+            // Fallback if runner failed or returned partial results
+            finalVerdict = Verdict.RUNTIME_ERROR;
+            System.err.println("Mismatch in results count or empty response from Runner.");
+        } else {
+            for (int i = 0; i < total; i++) {
+                TestCase testCase = testCases.get(i);
+                RunnerResult result = results.get(i); // Match result to test case by index
 
-            // ✅ FIX: Add a 1-second delay to prevent "429 Too Many Requests"
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                System.out.println("--- Test Case " + (i + 1) + " ---");
+                System.out.println("Expected: [" + testCase.getExpectedOutput() + "]");
+                System.out.println("Actual:   [" + result.getOutput() + "]");
+
+                // Check for Runtime Errors/Compilation Errors
+                if (result.getError() != null && !result.getError().isEmpty()) {
+                    finalVerdict = Verdict.RUNTIME_ERROR;
+                    break;
+                }
+
+                // Check Logic Correctness
+                boolean correct = OutputComparator.isOutputCorrect(
+                        result.getOutput(),
+                        testCase.getExpectedOutput()
+                );
+
+                if (!correct) {
+                    finalVerdict = Verdict.WRONG_ANSWER;
+                    break;
+                }
+                passed++;
             }
-
-            // The rest of your logic stays exactly the same
-            RunnerResult result = runnerClient.runJavaCode(sourceCode, testCase);
-
-            System.out.println("--- Test Case ---");
-            System.out.println("Input: " + testCase.getInput());
-            System.out.println("Expected: [" + testCase.getExpectedOutput() + "]");
-            System.out.println("Actual:   [" + result.getOutput() + "]");
-
-            if (result.getError() != null && !result.getError().isEmpty()) {
-                finalVerdict = Verdict.RUNTIME_ERROR;
-                break;
-            }
-
-            boolean correct = OutputComparator.isOutputCorrect(
-                    result.getOutput(),
-                    testCase.getExpectedOutput()
-            );
-
-            if (!correct) {
-                finalVerdict = Verdict.WRONG_ANSWER;
-                break;
-            }
-            passed++;
         }
 
+        // 6. Save and Return
         submission.setPassedTestCases(passed);
         submission.setTotalTestCases(total);
         submission.setAccepted(finalVerdict == Verdict.ACCEPTED);
