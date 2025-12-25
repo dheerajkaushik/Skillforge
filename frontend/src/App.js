@@ -330,9 +330,12 @@ function App() {
               </div>
             </div>
             {/* Decorative Placeholder / Illustration */}
-            <div className="hidden md:block bg-indigo-50 rounded-3xl h-96 w-full flex items-center justify-center relative overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-200 rounded-full blur-3xl opacity-50"></div>
-                <div className="relative text-indigo-900 font-bold text-2xl">Start Learning Today 🚀</div>
+            <div className="hidden md:block h-96 w-full">
+                <img
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKxijbpZmd_rjvJnQlRni50QgyEYAE5YqAvg&s"
+                  alt="Start Learning"
+                  className="w-full h-full object-cover rounded-3xl shadow-lg"
+                />
             </div>
           </div>
         )}
