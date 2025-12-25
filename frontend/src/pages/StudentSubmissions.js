@@ -20,7 +20,7 @@ export default function StudentSubmissions() {
   const fetchMySubmissions = async (token) => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/submissions/my`, {
+      const res = await axios.get(`${API}/coding/submissions/my`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
