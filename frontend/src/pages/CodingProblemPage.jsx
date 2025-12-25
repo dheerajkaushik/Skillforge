@@ -24,6 +24,9 @@ export default function CodingProblemPage() {
   const [loading, setLoading] = useState(true);
   const [studentId, setStudentId] = useState(null);
 
+  const [history, setHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -86,10 +89,10 @@ export default function CodingProblemPage() {
                 🏆 Leaderboard
               </button>
               <button
-              onClick={() => setActiveTab("Submission History")}
-                className={`flex-1 py-3 text-sm font-semibold ${activeTab === 'leaderboard' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+              onClick={() => setActiveTab("History")}
+                className={`flex-1 py-3 text-sm font-semibold ${activeTab === 'History' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
-                🏆 Leaderboard
+                🕒 History
                </button>
             </div>
 
@@ -123,6 +126,45 @@ export default function CodingProblemPage() {
                 {activeTab === "leaderboard" && (
                     <Leaderboard problemId={problemId} />
                 )}
+            {activeTab === "history" && (
+                                <div className="animate-fade-in">
+                                    {historyLoading ? (
+                                        <p className="text-center text-gray-500 py-10">Loading history...</p>
+                                    ) : history.length === 0 ? (
+                                        <div className="text-center py-10">
+                                            <p className="text-gray-400 text-4xl mb-2">📝</p>
+                                            <p className="text-gray-500">No submissions yet.</p>
+                                            <p className="text-xs text-gray-400">Submit your code to see it here!</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {history.map((sub, idx) => (
+                                                <div key={sub.id || idx} className="bg-white border rounded-lg p-3 hover:shadow-sm transition-shadow">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${getStatusColor(sub.verdict)}`}>
+                                                            {sub.verdict ? sub.verdict.replace("_", " ") : "UNKNOWN"}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400">
+                                                            {new Date(sub.submittedAt).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between items-end">
+                                                        <div className="text-xs text-gray-500">
+                                                            Tests: <b>{sub.passedTestCases}/{sub.totalTestCases}</b>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => setCode(sub.sourceCode)}
+                                                            className="text-xs text-blue-600 font-medium hover:underline"
+                                                        >
+                                                            Load Code
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
             </div>
           </div>
