@@ -3,18 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CodeEditor from "../components/CodeEditor";
 import VerdictBox from "../components/VerdictBox";
-// ✅ IMPORT YOUR LEADERBOARD COMPONENT
 import Leaderboard from "../Leaderboard";
-import { fetchProblem, fetchSamples, submitCode } from "../services/codingApi";
-import { API_BASE_URL as API} from "../config";
-//const API = process.env.REACT_APP_API || "http://localhost:8080/api";
+import { API_BASE_URL as API } from "../config";
 
 export default function CodingProblemPage() {
   const { problemId } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("sf_token");
 
-  // ✅ NEW STATE: For switching tabs
+  // Tabs: "description", "leaderboard", "history"
   const [activeTab, setActiveTab] = useState("description");
 
   const [problem, setProblem] = useState(null);
@@ -24,9 +21,11 @@ export default function CodingProblemPage() {
   const [loading, setLoading] = useState(true);
   const [studentId, setStudentId] = useState(null);
 
+  // History State
   const [history, setHistory] = useState([]);
-    const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
+  // 1. Initial Load
   useEffect(() => {
     async function loadData() {
       try {
@@ -48,6 +47,38 @@ export default function CodingProblemPage() {
     if (token) loadData();
   }, [problemId, token]);
 
+  // 2. ✅ FIX: Fetch History when Tab changes
+  useEffect(() => {
+    if (activeTab === "history" && token) {
+        fetchHistory();
+    }
+  }, [activeTab]);
+
+  // 3. ✅ FIX: The missing fetchHistory function
+  const fetchHistory = async () => {
+      try {
+          setHistoryLoading(true);
+          const res = await axios.get(`${API}/submissions/my`, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+
+          // Debugging
+          console.log("All My Submissions:", res.data);
+
+          // Safe Filtering Logic (Handles string vs number ID mismatch)
+          const filtered = res.data.filter(s => {
+              const pId = s.problem?.id || s.problemId;
+              return pId == problemId; // '==' allows "5" == 5
+          });
+
+          setHistory(filtered);
+      } catch (err) {
+          console.error("Failed to load history", err);
+      } finally {
+          setHistoryLoading(false);
+      }
+  };
+
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
@@ -56,8 +87,19 @@ export default function CodingProblemPage() {
         { headers: { "Content-Type": "text/plain", Authorization: `Bearer ${token}` } }
       );
       setSubmission(res.data);
+      // Refresh history if we are currently looking at it
+      if (activeTab === "history") fetchHistory();
     } catch (err) {
       alert("Submission failed: " + err.message);
+    }
+  };
+
+  // 4. ✅ FIX: The missing helper function
+  const getStatusColor = (verdict) => {
+    switch (verdict) {
+      case "ACCEPTED": return "text-green-600 bg-green-50 border-green-200";
+      case "WRONG_ANSWER": return "text-red-600 bg-red-50 border-red-200";
+      default: return "text-yellow-600 bg-yellow-50 border-yellow-200";
     }
   };
 
@@ -71,10 +113,10 @@ export default function CodingProblemPage() {
       </div>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* ✅ LEFT PANEL: Now flex-col to hold Tabs + Content */}
+          {/* LEFT PANEL */}
           <div className="w-full md:w-1/3 flex flex-col border-r bg-gray-50 h-full">
 
-            {/* 1. TAB HEADER */}
+            {/* TAB HEADER */}
             <div className="flex bg-white border-b">
               <button
                 onClick={() => setActiveTab("description")}
@@ -89,17 +131,18 @@ export default function CodingProblemPage() {
                 🏆 Leaderboard
               </button>
               <button
-              onClick={() => setActiveTab("History")}
-                className={`flex-1 py-3 text-sm font-semibold ${activeTab === 'History' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                // 5. ✅ FIX: Changed "History" to "history" (lowercase) to match state check
+                onClick={() => setActiveTab("history")}
+                className={`flex-1 py-3 text-sm font-semibold ${activeTab === 'history' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                 🕒 History
                </button>
             </div>
 
-            {/* 2. TAB CONTENT (Scrollable Area) */}
+            {/* TAB CONTENT */}
             <div className="flex-1 overflow-y-auto p-6">
 
-                {/* CASE A: Show Description */}
+                {/* --- DESCRIPTION --- */}
                 {activeTab === "description" && (
                     <>
                         <span className={`text-xs font-bold px-2 py-1 rounded ${problem.difficulty === 'HARD' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
@@ -122,54 +165,56 @@ export default function CodingProblemPage() {
                     </>
                 )}
 
-                {/* CASE B: Show Leaderboard */}
+                {/* --- LEADERBOARD --- */}
                 {activeTab === "leaderboard" && (
                     <Leaderboard problemId={problemId} />
                 )}
-            {activeTab === "history" && (
-                                <div className="animate-fade-in">
-                                    {historyLoading ? (
-                                        <p className="text-center text-gray-500 py-10">Loading history...</p>
-                                    ) : history.length === 0 ? (
-                                        <div className="text-center py-10">
-                                            <p className="text-gray-400 text-4xl mb-2">📝</p>
-                                            <p className="text-gray-500">No submissions yet.</p>
-                                            <p className="text-xs text-gray-400">Submit your code to see it here!</p>
+
+                {/* --- HISTORY --- */}
+                {activeTab === "history" && (
+                    <div className="animate-fade-in">
+                        {historyLoading ? (
+                            <p className="text-center text-gray-500 py-10">Loading history...</p>
+                        ) : history.length === 0 ? (
+                            <div className="text-center py-10">
+                                <p className="text-gray-400 text-4xl mb-2">📝</p>
+                                <p className="text-gray-500">No submissions yet.</p>
+                                <p className="text-xs text-gray-400">Submit your code to see it here!</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {history.map((sub, idx) => (
+                                    <div key={sub.id || idx} className="bg-white border rounded-lg p-3 hover:shadow-sm transition-shadow">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${getStatusColor(sub.verdict)}`}>
+                                                {sub.verdict ? sub.verdict.replace("_", " ") : "UNKNOWN"}
+                                            </span>
+                                            <span className="text-xs text-gray-400">
+                                                {new Date(sub.submittedAt).toLocaleString()}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            {history.map((sub, idx) => (
-                                                <div key={sub.id || idx} className="bg-white border rounded-lg p-3 hover:shadow-sm transition-shadow">
-                                                    <div className="flex justify-between items-center mb-2">
-                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${getStatusColor(sub.verdict)}`}>
-                                                            {sub.verdict ? sub.verdict.replace("_", " ") : "UNKNOWN"}
-                                                        </span>
-                                                        <span className="text-xs text-gray-400">
-                                                            {new Date(sub.submittedAt).toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex justify-between items-end">
-                                                        <div className="text-xs text-gray-500">
-                                                            Tests: <b>{sub.passedTestCases}/{sub.totalTestCases}</b>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => setCode(sub.sourceCode)}
-                                                            className="text-xs text-blue-600 font-medium hover:underline"
-                                                        >
-                                                            Load Code
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                        <div className="flex justify-between items-end">
+                                            <div className="text-xs text-gray-500">
+                                                Tests: <b>{sub.passedTestCases}/{sub.totalTestCases}</b>
+                                            </div>
+                                            <button
+                                                onClick={() => setCode(sub.sourceCode)}
+                                                className="text-xs text-blue-600 font-medium hover:underline"
+                                            >
+                                                Load Code
+                                            </button>
                                         </div>
-                                    )}
-                                </div>
-                            )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
             </div>
           </div>
 
-          {/* RIGHT PANEL: Code Editor (Unchanged) */}
+          {/* RIGHT PANEL: Code Editor */}
           <div className="w-full md:w-2/3 flex flex-col h-full">
             <div className="flex-1 overflow-hidden relative">
                  <CodeEditor code={code} setCode={setCode} />
