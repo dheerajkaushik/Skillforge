@@ -86,13 +86,20 @@ function App() {
       }
     }
   }
-
-  async function fetchCourses() {
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  async function fetchCourses(retryCount = 0) {
     try {
       const res = await axios.get(API + "/courses");
       setCourses(res.data);
     } catch (err) {
-      console.error(err);
+
+      if (retryCount < 3) {
+              console.log(`Backend might be sleeping. Retrying... (${retryCount + 1}/3)`);
+              await wait(3000); // Wait 3 seconds
+              fetchCourses(retryCount + 1); // Retry
+            } else {
+              console.error("Failed to fetch courses after retries", err);
+            }
     }
   }
 
