@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.skillforge.coding.repository.CodeSubmissionRepository;
 
 import com.skillforge.coding.entity.CodeSubmission;
 import com.skillforge.coding.service.CodeSubmissionService;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.*;
 public class CodeSubmissionController {
 
     private final CodeSubmissionService submissionService;
+    private final CodeSubmissionRepository submissionRepository;
 
-    public CodeSubmissionController(CodeSubmissionService submissionService) {
+    public CodeSubmissionController(CodeSubmissionService submissionService,CodeSubmissionRepository submissionRepository) {
         this.submissionService = submissionService;
+        this.submissionRepository = submissionRepository;
     }
 
     @PostMapping
@@ -42,4 +45,13 @@ public class CodeSubmissionController {
 
         return ResponseEntity.ok(history);
     }
+    @GetMapping
+    public ResponseEntity<List<CodeSubmission>> getAllSubmissions() {
+        // Fetches all submissions, sorted by newest first
+        List<CodeSubmission> allSubmissions = submissionRepository.findAll(
+                Sort.by(Sort.Direction.DESC, "submittedAt")
+        );
+        return ResponseEntity.ok(allSubmissions);
+    }
+
 }

@@ -1,9 +1,139 @@
+//import React, { useEffect, useState } from "react";
+//import axios from "axios";
+//import PageContainer from "./components/layout/PageContainer";
+//import Card from "./components/ui/Card";
+//import { API_BASE_URL } from "./config";
+////const API = process.env.REACT_APP_API || "http://localhost:8080/api"; //for local
+//
+//export default function AdminSubmissions({ token, user }) {
+//  const [subs, setSubs] = useState([]);
+//  const [loading, setLoading] = useState(true);
+//
+//  useEffect(() => {
+//    // Fallback logic for token
+//    const effectiveToken = token || localStorage.getItem("sf_token");
+//    if (effectiveToken) load(effectiveToken);
+//  }, [token]);
+//
+//  async function load(authToken) {
+//      try {
+//        setLoading(true);
+//
+//        // Ensure the URL matches your backend (add /api if needed, as discussed)
+//        const res = await axios.get(API_BASE_URL + "/admin/submissions", {
+//          headers: { Authorization: "Bearer " + authToken }
+//        });
+//
+//        console.log("Debug Submissions:", res.data); // Inspect the data in Console
+//
+//        // FIX: Handle both standard Array and Spring Boot "Page" object
+//        if (Array.isArray(res.data)) {
+//          setSubs(res.data);
+//        } else if (res.data && Array.isArray(res.data.content)) {
+//          // If your backend returns a Page object (e.g., { content: [...], totalPages: 5 })
+//          setSubs(res.data.content);
+//        } else {
+//          setSubs([]); // Fallback
+//        }
+//
+//      } catch (e) {
+//        console.error("Failed to load submissions", e);
+//      } finally {
+//        setLoading(false);
+//      }
+//    }
+//
+//  // Access Control
+//  if (user && user.role !== "ADMIN") {
+//      return (
+//        <PageContainer>
+//            <div className="p-10 text-center text-red-500 bg-red-50 rounded border border-red-200">
+//                ⛔ Access Denied. Admin permissions required.
+//            </div>
+//        </PageContainer>
+//      );
+//  }
+//
+//  // Helper to style language badges
+//  const getLangBadge = (lang) => {
+//      const l = lang ? lang.toUpperCase() : "UNKNOWN";
+//      switch(l) {
+//          case "JAVA": return "bg-orange-50 text-orange-700 border-orange-200";
+//          case "PYTHON": return "bg-blue-50 text-blue-700 border-blue-200";
+//          case "JS":
+//          case "JAVASCRIPT": return "bg-yellow-50 text-yellow-700 border-yellow-200";
+//          case "CPP": return "bg-blue-900 text-white border-blue-900";
+//          default: return "bg-gray-100 text-gray-600 border-gray-200";
+//      }
+//  };
+//
+//  return (
+//    <PageContainer>
+//      <div className="flex justify-between items-end mb-6">
+//        <div>
+//            <h2 className="text-2xl font-bold text-gray-800">Submission Log</h2>
+//            <p className="text-sm text-slate-500">Live feed of all student code executions.</p>
+//        </div>
+//        <span className="bg-white border text-gray-600 px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+//            Total Submissions: {subs.length}
+//        </span>
+//      </div>
+//
+//      <Card className="overflow-hidden">
+//        <div className="overflow-x-auto">
+//          <table className="w-full text-left border-collapse">
+//            <thead>
+//              <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
+//                <th className="p-4 font-semibold w-20">ID</th>
+//                <th className="p-4 font-semibold">User ID</th>
+//                <th className="p-4 font-semibold">Course ID</th>
+//                <th className="p-4 font-semibold">Language</th>
+//                <th className="p-4 font-semibold">Submitted At</th>
+//                <th className="p-4 font-semibold">Output / Result</th>
+//              </tr>
+//            </thead>
+//            <tbody className="divide-y divide-gray-100 text-sm">
+//              {loading ? (
+//                  <tr><td colSpan="6" className="p-8 text-center text-gray-500">Loading submissions...</td></tr>
+//              ) : subs.length === 0 ? (
+//                  <tr><td colSpan="6" className="p-8 text-center text-gray-500 italic">No submissions found.</td></tr>
+//              ) : (
+//                subs.map(s => (
+//                  <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+//                    <td className="p-4 font-mono text-gray-400">#{s.id}</td>
+//                    <td className="p-4 font-medium text-gray-700">User #{s.userId}</td>
+//                    <td className="p-4 text-gray-600">Course #{s.courseId}</td>
+//                    <td className="p-4">
+//                        <span className={`px-2 py-1 rounded border text-[10px] font-bold tracking-wide ${getLangBadge(s.language)}`}>
+//                            {s.language ? s.language.toUpperCase() : "N/A"}
+//                        </span>
+//                    </td>
+//                    <td className="p-4 text-gray-500 text-xs whitespace-nowrap">
+//                        {new Date(s.submittedAt).toLocaleString()}
+//                    </td>
+//                    <td className="p-4">
+//                        {/* Terminal Style Output Box */}
+//                        <div className="bg-gray-900 text-green-400 p-2 rounded-md font-mono text-xs max-w-xs overflow-x-auto max-h-20 scrollbar-thin scrollbar-thumb-gray-700 border border-gray-800">
+//                             {s.result ? String(s.result).slice(0, 150) : <span className="text-gray-600 italic">No output</span>}
+//                             {String(s.result).length > 150 && <span className="text-gray-500">...</span>}
+//                        </div>
+//                    </td>
+//                  </tr>
+//                ))
+//              )}
+//            </tbody>
+//          </table>
+//        </div>
+//      </Card>
+//    </PageContainer>
+//  );
+//}
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PageContainer from "./components/layout/PageContainer";
 import Card from "./components/ui/Card";
-import { API_BASE_URL } from "./config";
-//const API = process.env.REACT_APP_API || "http://localhost:8080/api"; //for local
+import { API_BASE_URL as API } from "./config";
 
 export default function AdminSubmissions({ token, user }) {
   const [subs, setSubs] = useState([]);
@@ -19,21 +149,20 @@ export default function AdminSubmissions({ token, user }) {
       try {
         setLoading(true);
 
-        // Ensure the URL matches your backend (add /api if needed, as discussed)
-        const res = await axios.get(API_BASE_URL + "/admin/submissions", {
+        // ✅ FIX 1: Point to the new CODING endpoint
+        const res = await axios.get(`${API}/coding/submissions`, {
           headers: { Authorization: "Bearer " + authToken }
         });
 
-        console.log("Debug Submissions:", res.data); // Inspect the data in Console
+        console.log("Debug Submissions:", res.data);
 
-        // FIX: Handle both standard Array and Spring Boot "Page" object
+        // Handle both standard Array and Spring Boot "Page" object
         if (Array.isArray(res.data)) {
           setSubs(res.data);
         } else if (res.data && Array.isArray(res.data.content)) {
-          // If your backend returns a Page object (e.g., { content: [...], totalPages: 5 })
           setSubs(res.data.content);
         } else {
-          setSubs([]); // Fallback
+          setSubs([]);
         }
 
       } catch (e) {
@@ -54,25 +183,23 @@ export default function AdminSubmissions({ token, user }) {
       );
   }
 
-  // Helper to style language badges
-  const getLangBadge = (lang) => {
-      const l = lang ? lang.toUpperCase() : "UNKNOWN";
-      switch(l) {
-          case "JAVA": return "bg-orange-50 text-orange-700 border-orange-200";
-          case "PYTHON": return "bg-blue-50 text-blue-700 border-blue-200";
-          case "JS":
-          case "JAVASCRIPT": return "bg-yellow-50 text-yellow-700 border-yellow-200";
-          case "CPP": return "bg-blue-900 text-white border-blue-900";
-          default: return "bg-gray-100 text-gray-600 border-gray-200";
-      }
+  // Helper for Status Badge (Verdict)
+  const getStatusBadge = (verdict) => {
+    switch (verdict) {
+      case "ACCEPTED": return "bg-green-100 text-green-700 border-green-200";
+      case "WRONG_ANSWER": return "bg-red-50 text-red-700 border-red-200";
+      case "RUNTIME_ERROR": return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "COMPILATION_ERROR": return "bg-orange-50 text-orange-700 border-orange-200";
+      default: return "bg-gray-100 text-gray-600 border-gray-200";
+    }
   };
 
   return (
     <PageContainer>
       <div className="flex justify-between items-end mb-6">
         <div>
-            <h2 className="text-2xl font-bold text-gray-800">Submission Log</h2>
-            <p className="text-sm text-slate-500">Live feed of all student code executions.</p>
+            <h2 className="text-2xl font-bold text-gray-800">Code Submission Log</h2>
+            <p className="text-sm text-slate-500">Live feed of student coding attempts.</p>
         </div>
         <span className="bg-white border text-gray-600 px-3 py-1 rounded-full text-sm font-medium shadow-sm">
             Total Submissions: {subs.length}
@@ -85,38 +212,46 @@ export default function AdminSubmissions({ token, user }) {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
                 <th className="p-4 font-semibold w-20">ID</th>
-                <th className="p-4 font-semibold">User ID</th>
-                <th className="p-4 font-semibold">Course ID</th>
+                <th className="p-4 font-semibold">Student ID</th>
+                <th className="p-4 font-semibold">Problem</th>
                 <th className="p-4 font-semibold">Language</th>
                 <th className="p-4 font-semibold">Submitted At</th>
-                <th className="p-4 font-semibold">Output / Result</th>
+                <th className="p-4 font-semibold">Verdict</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
               {loading ? (
-                  <tr><td colSpan="6" className="p-8 text-center text-gray-500">Loading submissions...</td></tr>
+                  <tr><td colSpan="6" className="p-8 text-center text-gray-500">Loading...</td></tr>
               ) : subs.length === 0 ? (
                   <tr><td colSpan="6" className="p-8 text-center text-gray-500 italic">No submissions found.</td></tr>
               ) : (
                 subs.map(s => (
                   <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 font-mono text-gray-400">#{s.id}</td>
-                    <td className="p-4 font-medium text-gray-700">User #{s.userId}</td>
-                    <td className="p-4 text-gray-600">Course #{s.courseId}</td>
+
+                    {/* ✅ FIX 2: Student ID */}
+                    <td className="p-4 font-medium text-gray-700">Student #{s.studentId}</td>
+
+                    {/* ✅ FIX 3: Problem Title (with safe optional chaining) */}
+                    <td className="p-4 text-blue-600 font-medium">
+                        {s.problem?.title || `Problem #${s.problem?.id}`}
+                    </td>
+
                     <td className="p-4">
-                        <span className={`px-2 py-1 rounded border text-[10px] font-bold tracking-wide ${getLangBadge(s.language)}`}>
-                            {s.language ? s.language.toUpperCase() : "N/A"}
+                        <span className="px-2 py-1 text-xs font-bold border rounded bg-gray-50 text-gray-600">
+                            {s.language || "JAVA"}
                         </span>
                     </td>
+
                     <td className="p-4 text-gray-500 text-xs whitespace-nowrap">
                         {new Date(s.submittedAt).toLocaleString()}
                     </td>
+
+                    {/* ✅ FIX 4: Verdict Badge */}
                     <td className="p-4">
-                        {/* Terminal Style Output Box */}
-                        <div className="bg-gray-900 text-green-400 p-2 rounded-md font-mono text-xs max-w-xs overflow-x-auto max-h-20 scrollbar-thin scrollbar-thumb-gray-700 border border-gray-800">
-                             {s.result ? String(s.result).slice(0, 150) : <span className="text-gray-600 italic">No output</span>}
-                             {String(s.result).length > 150 && <span className="text-gray-500">...</span>}
-                        </div>
+                        <span className={`px-2 py-1 rounded border text-[10px] font-bold tracking-wide uppercase ${getStatusBadge(s.verdict)}`}>
+                            {s.verdict ? s.verdict.replace("_", " ") : "PENDING"}
+                        </span>
                     </td>
                   </tr>
                 ))
