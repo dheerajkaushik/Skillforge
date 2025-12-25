@@ -150,10 +150,30 @@ export default function CodingProblemPage() {
                         </span>
                         <p className="mt-4 whitespace-pre-wrap">{problem.description}</p>
 
+                         {problem.inputDescription && (
+                                    <div className="mt-6">
+                                        <h3 className="font-bold text-sm text-gray-700 mb-1">Input Format</h3>
+                                        <p className="text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 border border-gray-100 rounded">
+                                            {problem.inputDescription}
+                                        </p>
+                                    </div>
+                                )}
+                            {/* ✅ NEW: Output Format */}
+                                        {problem.outputDescription && (
+                                            <div className="mt-4">
+                                                <h3 className="font-bold text-sm text-gray-700 mb-1">Output Format</h3>
+                                                <p className="text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 border border-gray-100 rounded">
+                                                    {problem.outputDescription}
+                                                </p>
+                                            </div>
+                                        )}
+
                         <div className="mt-6">
                             <h3 className="font-bold mb-2">Constraints:</h3>
                             <p className="font-mono text-sm bg-gray-100 p-2 rounded">{problem.constraints}</p>
                         </div>
+
+
 
                         <h3 className="mt-6 font-semibold">Sample Test Cases</h3>
                         {samples.map((tc, idx) => (
