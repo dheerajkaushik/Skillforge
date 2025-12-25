@@ -1,6 +1,7 @@
 package com.skillforge.coding.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*; // Use javax.persistence if on older Spring Boot
 import java.time.LocalDateTime;
 
@@ -15,7 +16,7 @@ public class CodeSubmission {
     // ✅ FIXED: Relationship to CodingProblem (replaces simple problemId Long)
     @ManyToOne
     @JoinColumn(name = "problem_id", nullable = false)
-    @JsonIgnore // Prevent infinite recursion when serializing
+    @JsonIgnoreProperties({"submissions", "hibernateLazyInitializer", "handler"})// Prevent infinite recursion when serializing
     private CodingProblem problem;
 
     private Long studentId;
