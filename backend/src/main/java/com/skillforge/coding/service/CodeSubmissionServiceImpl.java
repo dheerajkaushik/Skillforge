@@ -129,9 +129,17 @@ public class CodeSubmissionServiceImpl implements CodeSubmissionService {
     }
 
     @Override
-    public List<CodeSubmission> getSubmissionsForUserEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
+    public List<CodeSubmission> getSubmissionsForUserEmail(String emailOrId) {
+        // CHECK: Is the input actually a User ID (number)?
+        if (emailOrId.matches("\\d+")) {
+            // It's an ID (like "3"), so use it directly!
+            Long userId = Long.parseLong(emailOrId);
+            return codeSubmissionRepository.findByStudentIdOrderBySubmittedAtDesc(userId);
+        }
+
+        // Otherwise, treat it as an Email
+        User user = userRepository.findByEmail(emailOrId)
+                .orElseThrow(() -> new RuntimeException("User not found for email: " + emailOrId));
 
         return codeSubmissionRepository.findByStudentIdOrderBySubmittedAtDesc(user.getId());
     }
