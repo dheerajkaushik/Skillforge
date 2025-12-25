@@ -36,6 +36,14 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminView, setAdminView] = useState("users");
 
+useEffect(() => {
+    // Fire and forget - we don't need to wait for the response or show an error
+    // We just want to trigger the network request to wake up Render.
+    axios.get(`${API}/wake-up`).catch(() => {
+        // Ignore errors (e.g., if backend is still starting up, that's fine, we poked it)
+        console.log("Wake-up signal sent.");
+    });
+  }, []);
   // --- INITIAL LOAD ---
   useEffect(() => {
     fetchCourses();
