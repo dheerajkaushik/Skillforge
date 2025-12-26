@@ -2,6 +2,23 @@
 
 live at: https://skillforge-frontend-osg6.onrender.com
 
+Screenshots:
+![img_2.png](img_2.png)
+Admin dashboard:
+![img_3.png](img_3.png)
+
+![img_4.png](img_4.png)
+
+![img_5.png](img_5.png)
+Instructor course creation and management:
+![img_6.png](img_6.png)
+Quizes creation
+![img_7.png](img_7.png)
+Student code submition
+![img_8.png](img_8.png)
+Submittion history
+![img_9.png](img_9.png)
+
 SkillForge is a production-style Learning Management System (LMS) inspired by platforms like Udemy and Coursera, built using Java Spring Boot and React.
 It supports role-based dashboards, course creation, video & file uploads, lesson progress tracking, and admin management, all wrapped in a modern UI.
 
